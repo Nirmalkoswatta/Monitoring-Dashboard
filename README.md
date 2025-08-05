@@ -10,7 +10,7 @@ A beautiful, real-time monitoring dashboard for GitHub Actions and CI/CD pipelin
 ## ✨ Features
 
 - **Real-time Monitoring**: Live updates of GitHub Actions workflow status
-- **Beautiful UI**: Modern dashboard with Tailwind CSS styling
+- **Beautiful UI**: Modern dashboard with custom CSS styling
 - **Interactive Charts**: Visual representation of build trends and statistics
 - **Repository Switching**: Monitor multiple repositories dynamically
 - **Auto-refresh**: Configurable refresh intervals (10s to 5m)
@@ -22,7 +22,7 @@ A beautiful, real-time monitoring dashboard for GitHub Actions and CI/CD pipelin
 
 ### Frontend
 - **React 18+** - Modern UI framework
-- **Tailwind CSS** - Utility-first styling
+- **Custom CSS** - Beautiful responsive styling
 - **Recharts** - Interactive data visualization
 - **Axios** - HTTP client for API calls
 
