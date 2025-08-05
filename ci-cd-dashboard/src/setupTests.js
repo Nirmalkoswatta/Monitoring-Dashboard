@@ -8,8 +8,14 @@ import '@testing-library/jest-dom';
 jest.mock('axios', () => ({
   __esModule: true,
   default: {
-    get: jest.fn(() => Promise.resolve({ data: {} })),
-    post: jest.fn(() => Promise.resolve({ data: {} })),
+    get: jest.fn(() => Promise.resolve({ 
+      data: { 
+        runs: [],
+        workflows: [],
+        workflow_runs: [],
+      } 
+    })),
+    post: jest.fn(() => Promise.resolve({ data: { success: true } })),
     put: jest.fn(() => Promise.resolve({ data: {} })),
     delete: jest.fn(() => Promise.resolve({ data: {} })),
   },
@@ -27,3 +33,15 @@ jest.mock('recharts', () => ({
   BarChart: ({ children }) => <div data-testid="bar-chart">{children}</div>,
   Bar: () => <div data-testid="bar" />,
 }));
+
+// Mock environment variables
+process.env.REACT_APP_API_URL = undefined;
+process.env.REACT_APP_GITHUB_TOKEN = undefined;
+
+// Mock window.location
+Object.defineProperty(window, 'location', {
+  value: {
+    hostname: 'localhost'
+  },
+  writable: true
+});
