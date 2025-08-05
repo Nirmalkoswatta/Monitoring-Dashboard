@@ -9,8 +9,21 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [repo, setRepo] = useState({ owner: 'octocat', repo: 'Hello-World' });
+  const [repoInput, setRepoInput] = useState('octocat/Hello-World');
   const [refreshInterval, setRefreshInterval] = useState(30);
   const [lastUpdated, setLastUpdated] = useState(null);
+
+  const isValidRepo = (input) => {
+    const parts = input.split('/');
+    return parts.length === 2 && parts[0].trim() && parts[1].trim();
+  };
+
+  const handleRepoChange = () => {
+    if (isValidRepo(repoInput)) {
+      const [owner, repoName] = repoInput.split('/');
+      setRepo({ owner: owner.trim(), repo: repoName.trim() });
+    }
+  };
 
   const API_BASE = 'http://localhost:5000/api';
 
@@ -93,23 +106,42 @@ const Dashboard = () => {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">🚀 CI/CD Monitoring Dashboard</h1>
-              <p className="text-gray-600 mt-1">Real-time monitoring of GitHub Actions workflows</p>
+              <p className="text-gray-600 mt-1">
+                Real-time monitoring of GitHub Actions workflows
+                {repo.owner && repo.repo && (
+                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                    📁 {repo.owner}/{repo.repo}
+                  </span>
+                )}
+              </p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <label className="text-sm text-gray-600">Repository:</label>
                 <input
                   type="text"
-                  placeholder="owner/repo"
-                  className="px-3 py-1 border border-gray-300 rounded-md text-sm"
-                  value={`${repo.owner}/${repo.repo}`}
-                  onChange={(e) => {
-                    const [owner, repoName] = e.target.value.split('/');
-                    if (owner && repoName) {
-                      setRepo({ owner, repo: repoName });
+                  placeholder="owner/repo (e.g., facebook/react)"
+                  className={`px-3 py-1 border rounded-md text-sm ${
+                    isValidRepo(repoInput) 
+                      ? 'border-gray-300 focus:border-blue-500' 
+                      : 'border-red-300 focus:border-red-500'
+                  }`}
+                  value={repoInput}
+                  onChange={(e) => setRepoInput(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleRepoChange();
                     }
                   }}
+                  onBlur={handleRepoChange}
                 />
+                <button
+                  onClick={handleRepoChange}
+                  disabled={!isValidRepo(repoInput)}
+                  className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                >
+                  Load
+                </button>
               </div>
               <div className="flex items-center space-x-2">
                 <label className="text-sm text-gray-600">Refresh:</label>
