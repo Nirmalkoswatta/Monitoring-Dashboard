@@ -1,0 +1,40 @@
+{
+  "name": "ci-cd-monitoring-dashboard",
+  "version": "1.0.0",
+  "description": "A beautiful, real-time monitoring dashboard for GitHub Actions and CI/CD pipelines",
+  "scripts": {
+    "install-all": "npm install && cd ci-cd-dashboard && npm install && cd ../backend && npm install",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "cd ci-cd-dashboard && npm start",
+    "start:backend": "cd backend && npm start",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd ci-cd-dashboard && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "cd ci-cd-dashboard && npm run build",
+    "test": "cd backend && npm test",
+    "setup": "cd backend && npm run setup",
+    "test:api": "cd backend && npm test"
+  },
+  "keywords": [
+    "ci-cd",
+    "monitoring",
+    "dashboard",
+    "github-actions",
+    "react",
+    "nodejs",
+    "express"
+  ],
+  "author": "Nirmal Koswatta",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nirmalkoswatta/Monitoring-Dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nirmalkoswatta/Monitoring-Dashboard/issues"
+  },
+  "homepage": "https://github.com/Nirmalkoswatta/Monitoring-Dashboard#readme"
+}

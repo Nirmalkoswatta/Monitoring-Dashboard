@@ -1,0 +1,77 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ci-cd-dashboard/package-lock.json
+          
+      - name: Install frontend dependencies
+        run: |
+          cd ci-cd-dashboard
+          npm ci
+          
+      - name: Run frontend tests
+        run: |
+          cd ci-cd-dashboard
+          npm test -- --coverage --watchAll=false
+          
+      - name: Build frontend
+        run: |
+          cd ci-cd-dashboard
+          npm run build
+
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+          
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+          
+      - name: Start backend server
+        run: |
+          cd backend
+          npm start &
+          sleep 5
+          
+      - name: Test API endpoints
+        run: |
+          curl -f http://localhost:5000/api/health || exit 1
+
+  deploy:
+    needs: [test-frontend, test-backend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Deploy notification
+        run: |
+          echo "🚀 Deploying CI/CD Monitoring Dashboard"
+          echo "✅ All tests passed, deployment would happen here"
