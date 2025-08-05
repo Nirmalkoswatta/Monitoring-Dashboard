@@ -71,7 +71,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Deploy notification
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ci-cd-dashboard/package-lock.json
+          
+      - name: Install frontend dependencies
         run: |
-          echo "🚀 Deploying CI/CD Monitoring Dashboard"
-          echo "✅ All tests passed, deployment would happen here"
+          cd ci-cd-dashboard
+          npm ci
+          
+      - name: Build frontend
+        run: |
+          cd ci-cd-dashboard
+          npm run build
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ci-cd-dashboard/build
+          publish_branch: gh-pages
