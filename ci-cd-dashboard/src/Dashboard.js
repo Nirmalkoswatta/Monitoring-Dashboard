@@ -391,6 +391,15 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
+
+        {/* Footer */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="text-center">
+            <p className="text-gray-600 text-sm">
+              Created with ❤️ by <span className="font-semibold text-gray-800">Nirmal Koswatta</span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

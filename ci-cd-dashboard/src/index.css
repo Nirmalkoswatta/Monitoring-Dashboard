@@ -95,10 +95,14 @@ code {
 .mt-1 { margin-top: 0.25rem; }
 .mt-2 { margin-top: 0.5rem; }
 .mt-4 { margin-top: 1rem; }
+.mt-12 { margin-top: 3rem; }
 .mb-2 { margin-bottom: 0.5rem; }
 .mb-4 { margin-bottom: 1rem; }
 .mb-6 { margin-bottom: 1.5rem; }
 .mx-auto { margin-left: auto; margin-right: auto; }
+
+.pt-8 { padding-top: 2rem; }
+.border-t { border-top-width: 1px; border-top-style: solid; }
 
 /* Typography */
 .text-xs { font-size: 0.75rem; line-height: 1rem; }
