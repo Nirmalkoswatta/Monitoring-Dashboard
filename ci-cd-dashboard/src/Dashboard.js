@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [repoInput, setRepoInput] = useState('octocat/Hello-World');
   const [refreshInterval, setRefreshInterval] = useState(30);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [apiMode, setApiMode] = useState('backend'); // 'backend' or 'direct'
 
   const isValidRepo = (input) => {
     const parts = input.split('/');
@@ -25,33 +26,89 @@ const Dashboard = () => {
     }
   };
 
-  const API_BASE = 'http://localhost:5000/api';
+  // Dynamic API base URL - supports both local development and production
+  const API_BASE = process.env.REACT_APP_API_URL || 
+                  (window.location.hostname === 'localhost' 
+                    ? 'http://localhost:5000/api'
+                    : 'https://api.github.com');
+
+  const GITHUB_API_BASE = 'https://api.github.com';
+  const GITHUB_TOKEN = process.env.REACT_APP_GITHUB_TOKEN;
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch workflow runs
-      const statusRes = await axios.get(`${API_BASE}/github-status`, {
-        params: { owner: repo.owner, repo: repo.repo }
-      });
-      setBuildStatus(statusRes.data.runs);
+      let statusData = null;
+      let workflowData = null;
 
-      // Fetch workflows
-      const workflowRes = await axios.get(`${API_BASE}/github-workflows`, {
-        params: { owner: repo.owner, repo: repo.repo }
-      });
-      setWorkflows(workflowRes.data.workflows);
+      // Try backend API first (if available)
+      if (API_BASE.includes('localhost:5000')) {
+        try {
+          const statusRes = await axios.get(`${API_BASE}/github-status`, {
+            params: { owner: repo.owner, repo: repo.repo }
+          });
+          statusData = statusRes.data.runs;
 
+          const workflowRes = await axios.get(`${API_BASE}/github-workflows`, {
+            params: { owner: repo.owner, repo: repo.repo }
+          });
+          workflowData = workflowRes.data.workflows;
+          setApiMode('backend');
+        } catch (backendError) {
+          console.warn('Backend API not available, falling back to GitHub API');
+          setApiMode('direct');
+        }
+      }
+
+      // Fallback to direct GitHub API calls
+      if (!statusData || !workflowData) {
+        const headers = {};
+        if (GITHUB_TOKEN) {
+          headers.Authorization = `token ${GITHUB_TOKEN}`;
+        }
+
+        try {
+          // Fetch workflow runs directly from GitHub
+          const runsResponse = await axios.get(
+            `${GITHUB_API_BASE}/repos/${repo.owner}/${repo.repo}/actions/runs`,
+            { headers, params: { per_page: 10 } }
+          );
+          
+          statusData = runsResponse.data.workflow_runs || [];
+
+          // Fetch workflows directly from GitHub
+          const workflowsResponse = await axios.get(
+            `${GITHUB_API_BASE}/repos/${repo.owner}/${repo.repo}/actions/workflows`,
+            { headers }
+          );
+          
+          workflowData = workflowsResponse.data.workflows || [];
+          setApiMode('direct');
+
+        } catch (githubError) {
+          if (githubError.response?.status === 404) {
+            throw new Error(`Repository "${repo.owner}/${repo.repo}" not found or not accessible`);
+          } else if (githubError.response?.status === 403) {
+            throw new Error('GitHub API rate limit exceeded or insufficient permissions');
+          } else {
+            throw new Error(`GitHub API error: ${githubError.message}`);
+          }
+        }
+      }
+
+      setBuildStatus(statusData);
+      setWorkflows(workflowData);
       setLastUpdated(new Date());
+
     } catch (err) {
       console.error('Error fetching data:', err);
-      setError(err.response?.data?.error || 'Failed to fetch data');
+      setError(err.message || 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
-  }, [repo.owner, repo.repo]);
+  }, [repo.owner, repo.repo, API_BASE, GITHUB_TOKEN]);
 
   useEffect(() => {
     fetchData();
@@ -106,14 +163,23 @@ const Dashboard = () => {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">🚀 CI/CD Monitoring Dashboard</h1>
-              <p className="text-gray-600 mt-1">
-                Real-time monitoring of GitHub Actions workflows
+              <div className="text-gray-600 mt-1">
+                <span>Real-time monitoring of GitHub Actions workflows</span>
                 {repo.owner && repo.repo && (
                   <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
                     📁 {repo.owner}/{repo.repo}
                   </span>
                 )}
-              </p>
+                {apiMode === 'backend' ? (
+                  <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                    🔗 Backend API: Active
+                  </span>
+                ) : (
+                  <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">
+                    ⚠️ Direct GitHub API
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -176,9 +242,21 @@ const Dashboard = () => {
         {/* Error State */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center">
+            <div className="flex items-center mb-2">
               <span className="text-red-600 mr-2">⚠️</span>
-              <p className="text-red-800">{error}</p>
+              <p className="text-red-800 font-medium">Connection Error</p>
+            </div>
+            <p className="text-red-700 mb-3">{error}</p>
+            <div className="text-sm text-red-600">
+              <p className="mb-1"><strong>Troubleshooting:</strong></p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Check if the repository "{repo.owner}/{repo.repo}" exists and is public</li>
+                <li>Verify your GitHub token in environment variables (REACT_APP_GITHUB_TOKEN)</li>
+                <li>Ensure you have internet connectivity</li>
+                {!GITHUB_TOKEN && (
+                  <li className="text-red-800 font-medium">⚠️ No GitHub token configured - this may cause rate limiting</li>
+                )}
+              </ul>
             </div>
           </div>
         )}

@@ -6,12 +6,26 @@ const NotificationCenter = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
+  // Dynamic API base URL - supports both local development and production
+  const API_BASE = process.env.REACT_APP_API_URL || 
+                  (window.location.hostname === 'localhost' 
+                    ? 'http://localhost:5000/api'
+                    : null);
+
   const sendSlackNotification = async () => {
     if (!message.trim()) return;
     
+    if (!API_BASE) {
+      setResult({ 
+        type: 'error', 
+        message: 'Slack notifications require a backend API. Please set REACT_APP_API_URL environment variable.' 
+      });
+      return;
+    }
+    
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/notify-slack', {
+      await axios.post(`${API_BASE}/notify-slack`, {
         message: message
       });
       setResult({ type: 'success', message: 'Notification sent successfully!' });
@@ -19,7 +33,7 @@ const NotificationCenter = () => {
     } catch (error) {
       setResult({ 
         type: 'error', 
-        message: error.response?.data?.error || 'Failed to send notification' 
+        message: error.response?.data?.error || 'Failed to send notification. Backend API may not be available.' 
       });
     } finally {
       setLoading(false);

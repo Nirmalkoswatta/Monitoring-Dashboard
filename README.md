@@ -60,21 +60,26 @@ Create \`.env\` file:
 GITHUB_TOKEN=your_github_personal_access_token_here
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
 PORT=5000
-\`\`\`
+```
 
 Start backend server:
-\`\`\`bash
+```bash
 npm start
 # or for development
 npm run dev
-\`\`\`
+```
 
 ### 3. Setup Frontend
-\`\`\`bash
+```bash
 cd ../ci-cd-dashboard
 npm install
+
+# Copy and configure environment variables
+cp .env.example .env.local
+# Edit .env.local with your GitHub token
+
 npm start
-\`\`\`
+```
 
 ### 4. Access Dashboard
 - Frontend: http://localhost:3000
@@ -112,14 +117,54 @@ GET /api/github-workflows?owner=USERNAME&repo=REPONAME
 \`\`\`
 
 ### Slack Notifications
-\`\`\`http
+```http
 POST /api/notify-slack
 Content-Type: application/json
 
 {
   "message": "Your notification message"
 }
-\`\`\`
+```
+
+## 🌐 Production Deployment
+
+### Netlify Deployment (Recommended)
+
+1. **Frontend Deployment**:
+   ```bash
+   # Build the frontend
+   cd ci-cd-dashboard
+   npm run build
+   
+   # Deploy to Netlify (using Netlify CLI)
+   npm install -g netlify-cli
+   netlify deploy --prod --dir=build
+   ```
+
+2. **Environment Variables**:
+   - Go to Netlify Dashboard → Site Settings → Environment Variables
+   - Add required variables:
+     ```
+     REACT_APP_GITHUB_TOKEN=your_github_token
+     REACT_APP_API_URL=https://your-backend-url/api
+     ```
+
+3. **HTTPS Support**:
+   - Netlify provides automatic HTTPS
+   - The dashboard supports both HTTP (localhost) and HTTPS (production)
+   - API calls automatically adapt to the environment
+
+### Backend Deployment Options
+
+1. **Heroku**: Use the included `package.json` and set environment variables
+2. **Railway**: One-click deploy with GitHub integration
+3. **Render**: Automatic deployments from GitHub
+
+### Configuration Files
+
+- `.env.example`: Template for environment variables
+- `.env.production`: Production-specific configuration
+- `CONFIGURATION.md`: Detailed setup guide
 
 ## 🎨 Dashboard Features
 
@@ -128,6 +173,11 @@ Content-Type: application/json
 - Success rate percentage
 - Active workflows count
 - Last run timestamp
+
+### API Connection Status
+- **Backend API**: Green indicator when backend is available
+- **Direct GitHub API**: Yellow indicator when using fallback mode
+- Automatic failover between modes
 
 ### Interactive Charts
 - **Line Chart**: Build trends over time

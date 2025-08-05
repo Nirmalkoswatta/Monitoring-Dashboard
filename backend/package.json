@@ -1,6 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "description": "Backend API for CI/CD Monitoring Dashboard",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -9,10 +10,15 @@
     "test": "node test-api.js",
     "test:original": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "ci-cd",
+    "monitoring",
+    "github-api",
+    "nodejs",
+    "express"
+  ],
+  "author": "Nirmal Koswatta",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.11.0",
     "cors": "^2.8.5",
