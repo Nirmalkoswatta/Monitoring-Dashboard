@@ -27,6 +27,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(axios|recharts)/)"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
