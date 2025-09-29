@@ -300,7 +300,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-- 📧 Email: support@monitoring-dashboard.com
+- 📧 Email: nirmalkoza@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/Nirmalkoswatta/Monitoring-Dashboard/issues)
 - 📖 Documentation: [Wiki](https://github.com/Nirmalkoswatta/Monitoring-Dashboard/wiki)
 
