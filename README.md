@@ -21,35 +21,41 @@ A beautiful, real-time monitoring dashboard for GitHub Actions and CI/CD pipelin
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 18+** - Modern UI framework
 - **Custom CSS** - Beautiful responsive styling
 - **Recharts** - Interactive data visualization
 - **Axios** - HTTP client for API calls
 
 ### Backend
+
 - **Node.js** - Runtime environment
 - **Express** - Web framework
 - **GitHub API** - CI/CD data source
 - **CORS** - Cross-origin resource sharing
 
 ### CI/CD
+
 - **GitHub Actions** - Automated workflows
 - **Deployment Ready** - Netlify & Render compatible
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+ installed
 - GitHub personal access token
 - Git repository with GitHub Actions
 
 ### 1. Clone Repository
+
 \`\`\`bash
 git clone https://github.com/Nirmalkoswatta/Monitoring-Dashboard.git
 cd Monitoring-Dashboard
 \`\`\`
 
 ### 2. Setup Backend
+
 \`\`\`bash
 cd backend
 npm install
@@ -60,16 +66,18 @@ Create \`.env\` file:
 GITHUB_TOKEN=your_github_personal_access_token_here
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK
 PORT=5000
-```
+
+````
 
 Start backend server:
 ```bash
 npm start
 # or for development
 npm run dev
-```
+````
 
 ### 3. Setup Frontend
+
 ```bash
 cd ../ci-cd-dashboard
 npm install
@@ -82,12 +90,14 @@ npm start
 ```
 
 ### 4. Access Dashboard
+
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:5000/api/health
 
 ## 🔧 Configuration
 
 ### GitHub Token Setup
+
 1. Go to GitHub Settings → Developer settings → Personal access tokens
 2. Generate new token with scopes:
    - `repo` - Repository access
@@ -95,6 +105,7 @@ npm start
 3. Copy token to `.env` file
 
 ### Slack Integration (Optional)
+
 1. Create Slack webhook: https://api.slack.com/messaging/webhooks
 2. Add webhook URL to `.env` file
 3. Test notifications via API endpoint
@@ -102,21 +113,25 @@ npm start
 ## 📊 API Endpoints
 
 ### Health Check
+
 \`\`\`http
 GET /api/health
 \`\`\`
 
 ### GitHub Workflow Runs
+
 \`\`\`http
 GET /api/github-status?owner=USERNAME&repo=REPONAME
 \`\`\`
 
 ### GitHub Workflows
+
 \`\`\`http
 GET /api/github-workflows?owner=USERNAME&repo=REPONAME
 \`\`\`
 
 ### Slack Notifications
+
 ```http
 POST /api/notify-slack
 Content-Type: application/json
@@ -131,17 +146,19 @@ Content-Type: application/json
 ### Netlify Deployment (Recommended)
 
 1. **Frontend Deployment**:
+
    ```bash
    # Build the frontend
    cd ci-cd-dashboard
    npm run build
-   
+
    # Deploy to Netlify (using Netlify CLI)
    npm install -g netlify-cli
    netlify deploy --prod --dir=build
    ```
 
 2. **Environment Variables**:
+
    - Go to Netlify Dashboard → Site Settings → Environment Variables
    - Add required variables:
      ```
@@ -169,28 +186,33 @@ Content-Type: application/json
 ## 🎨 Dashboard Features
 
 ### Real-time Stats
+
 - Total workflow runs
 - Success rate percentage
 - Active workflows count
 - Last run timestamp
 
 ### API Connection Status
+
 - **Backend API**: Green indicator when backend is available
 - **Direct GitHub API**: Yellow indicator when using fallback mode
 - Automatic failover between modes
 
 ### Interactive Charts
+
 - **Line Chart**: Build trends over time
 - **Bar Chart**: Status distribution
 - **Responsive**: Adapts to screen size
 
 ### Workflow List
+
 - Live status indicators
 - Branch and commit information
 - Duration calculations
 - Direct GitHub links
 
 ### Customization
+
 - Repository switching
 - Refresh interval control
 - Real-time updates
@@ -199,17 +221,20 @@ Content-Type: application/json
 ## 🚢 Deployment
 
 ### Frontend (Netlify)
+
 1. Build the project: \`npm run build\`
 2. Deploy \`build\` folder to Netlify
 3. Set environment variables if needed
 
 ### Backend (Render)
+
 1. Connect GitHub repository
 2. Set build command: \`npm install\`
 3. Set start command: \`npm start\`
 4. Add environment variables
 
 ### Environment Variables for Production
+
 \`\`\`env
 GITHUB_TOKEN=your_production_token
 SLACK_WEBHOOK_URL=your_slack_webhook
@@ -227,6 +252,7 @@ NODE_ENV=production
 ## 📈 Monitoring Multiple Repositories
 
 The dashboard supports monitoring multiple repositories:
+
 1. Enter \`owner/repo\` in the repository input
 2. Dashboard automatically fetches new data
 3. Bookmarks for quick switching between projects
@@ -242,6 +268,7 @@ The dashboard supports monitoring multiple repositories:
 ## 🔄 Auto-refresh
 
 Configurable refresh intervals:
+
 - 10 seconds - For active development
 - 30 seconds - Default setting
 - 1 minute - Regular monitoring

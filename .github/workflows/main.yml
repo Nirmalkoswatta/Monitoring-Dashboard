@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: write
@@ -18,24 +18,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
           cache-dependency-path: ci-cd-dashboard/package-lock.json
-          
+
       - name: Install frontend dependencies
         run: |
           cd ci-cd-dashboard
           npm ci
-          
+
       - name: Run frontend tests
         run: |
           cd ci-cd-dashboard
           npm test -- --coverage --watchAll=false
-          
+
       - name: Build frontend
         run: |
           cd ci-cd-dashboard
@@ -46,25 +46,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
           cache-dependency-path: backend/package-lock.json
-          
+
       - name: Install backend dependencies
         run: |
           cd backend
           npm ci
-          
+
       - name: Start backend server
         run: |
           cd backend
           npm start &
           sleep 5
-          
+
       - name: Test API endpoints
         run: |
           curl -f http://localhost:5000/api/health || exit 1
@@ -76,24 +76,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
           cache-dependency-path: ci-cd-dashboard/package-lock.json
-          
+
       - name: Install frontend dependencies
         run: |
           cd ci-cd-dashboard
           npm ci
-          
+
       - name: Build frontend
         run: |
           cd ci-cd-dashboard
           npm run build
-          
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

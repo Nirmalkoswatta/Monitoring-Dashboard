@@ -5,6 +5,7 @@
 ### For Local Development
 
 1. Copy `.env.example` to `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
@@ -16,6 +17,7 @@
 ### For Production Deployment
 
 1. **Netlify Configuration**:
+
    - Go to your Netlify site settings
    - Navigate to "Environment variables"
    - Add the following variables:
@@ -34,6 +36,7 @@
 To test if your configuration is working:
 
 1. **Local Testing**:
+
    ```bash
    npm start
    ```
@@ -46,6 +49,7 @@ To test if your configuration is working:
 ### API Fallback
 
 The dashboard supports two modes:
+
 - **Backend API**: Uses your Node.js backend (recommended)
 - **Direct GitHub API**: Falls back to direct GitHub API calls
 
