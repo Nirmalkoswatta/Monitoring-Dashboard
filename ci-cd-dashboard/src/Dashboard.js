@@ -231,7 +231,6 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-          //realtime time show //
           {lastUpdated && (
             <p className="text-xs text-gray-500 mt-4">
               Last updated: {lastUpdated.toLocaleString()}
