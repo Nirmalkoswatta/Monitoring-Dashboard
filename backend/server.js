@@ -16,10 +16,20 @@ const envAllowedOrigins = (process.env.CORS_ORIGINS || '')
   .map(origin => origin.trim())
   .filter(Boolean);
 const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])];
+const allowedOriginPatterns = [
+  /^https:\/\/([a-z0-9-]+--)?ci-cd-monitoring-dashboard\.netlify\.app$/
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (
+      allowedOrigins.includes(origin) ||
+      allowedOriginPatterns.some((pattern) => pattern.test(origin))
+    ) {
       return callback(null, true);
     }
     console.warn(`Blocked CORS origin: ${origin}`);
