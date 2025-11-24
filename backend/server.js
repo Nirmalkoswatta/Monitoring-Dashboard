@@ -20,16 +20,18 @@ const allowedOriginPatterns = [
   /^https:\/\/([a-z0-9-]+--)?ci-cd-monitoring-dashboard\.netlify\.app$/
 ];
 
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+
+  return (
+    allowedOrigins.includes(origin) ||
+    allowedOriginPatterns.some((pattern) => pattern.test(origin))
+  );
+};
+
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    if (
-      allowedOrigins.includes(origin) ||
-      allowedOriginPatterns.some((pattern) => pattern.test(origin))
-    ) {
+    if (isOriginAllowed(origin)) {
       return callback(null, true);
     }
     console.warn(`Blocked CORS origin: ${origin}`);
@@ -39,8 +41,14 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+const corsMiddleware = cors(corsOptions);
+app.use(corsMiddleware);
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return corsMiddleware(req, res, () => res.sendStatus(204));
+  }
+  return next();
+});
 app.use(express.json());
 
 // Test endpoint
