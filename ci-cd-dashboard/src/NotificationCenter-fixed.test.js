@@ -24,7 +24,7 @@ describe('NotificationCenter Component', () => {
   test('handles message input change', () => {
     render(<NotificationCenter />);
     const textarea = screen.getByPlaceholderText(/Enter your notification message.../i);
-    
+
     fireEvent.change(textarea, { target: { value: 'Test notification' } });
     expect(textarea.value).toBe('Test notification');
   });
@@ -33,10 +33,10 @@ describe('NotificationCenter Component', () => {
     render(<NotificationCenter />);
     const button = screen.getByRole('button', { name: /Send Notification/i });
     const textarea = screen.getByPlaceholderText(/Enter your notification message.../i);
-    
+
     // Button should be disabled with empty message
     expect(button).toBeDisabled();
-    
+
     // Button should be enabled with message
     fireEvent.change(textarea, { target: { value: 'Test message' } });
     expect(button).not.toBeDisabled();
