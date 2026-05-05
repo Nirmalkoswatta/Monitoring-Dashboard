@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -73,6 +75,9 @@ jobs:
     needs: [ test-frontend, test-backend ]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -94,10 +99,11 @@ jobs:
           cd ci-cd-dashboard
           npm run build
 
-      - name: Deploy to Netlify
-        uses: netlify/actions/cli@master
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          args: deploy --dir=ci-cd-dashboard/build --prod
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          path: ci-cd-dashboard/build
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
