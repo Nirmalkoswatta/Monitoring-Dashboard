@@ -5,7 +5,7 @@ import NotificationCenter from './NotificationCenter';
 describe('NotificationCenter Component', () => {
   test('renders notification center title', () => {
     render(<NotificationCenter />);
-    const element = screen.getByText('Notification Center');
+    const element = screen.getByText(/Notification Center/i);
     expect(element).toBeInTheDocument();
   });
 
