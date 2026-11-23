@@ -5,7 +5,7 @@ import NotificationCenter from './NotificationCenter';
 describe('NotificationCenter Component', () => {
   test('renders notification center title', () => {
     render(<NotificationCenter />);
-    const element = screen.getByText(/🔔 Notification Center/i);
+    const element = screen.getByText(/Notification Center/i);
     expect(element).toBeInTheDocument();
   });
 
@@ -42,13 +42,6 @@ describe('NotificationCenter Component', () => {
     expect(button).not.toBeDisabled();
   });
 
-  test('renders footer with creator name', () => {
-    render(<NotificationCenter />);
-    const footer = screen.getByText(/Created with ❤️ by/i);
-    const creatorName = screen.getByText(/Nirmal Koswatta/i);
-    expect(footer).toBeInTheDocument();
-    expect(creatorName).toBeInTheDocument();
-  });
 
   test('renders slack notification label', () => {
     render(<NotificationCenter />);

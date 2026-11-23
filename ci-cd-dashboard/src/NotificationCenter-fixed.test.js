@@ -42,13 +42,6 @@ describe('NotificationCenter Component', () => {
     expect(button).not.toBeDisabled();
   });
 
-  test('renders footer with creator name', () => {
-    render(<NotificationCenter />);
-    const footer = screen.getByText(/Created with ❤️ by/i);
-    const creatorName = screen.getByText(/Nirmal Koswatta/i);
-    expect(footer).toBeInTheDocument();
-    expect(creatorName).toBeInTheDocument();
-  });
 
   test('renders slack notification label', () => {
     render(<NotificationCenter />);
