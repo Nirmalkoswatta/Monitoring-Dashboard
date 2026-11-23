@@ -107,3 +107,23 @@ describe('Dashboard Component', () => {
     expect(apiStatus).toBeInTheDocument();
   });
 });
+
+describe('run helpers', () => {
+  const { runState, formatDuration } = require('./Dashboard');
+
+  test('maps GitHub status/conclusion to a UI state', () => {
+    expect(runState({ status: 'completed', conclusion: 'success' })).toBe('success');
+    expect(runState({ status: 'completed', conclusion: 'timed_out' })).toBe('failure');
+    expect(runState({ status: 'completed', conclusion: 'cancelled' })).toBe('cancelled');
+    expect(runState({ status: 'in_progress' })).toBe('running');
+    expect(runState({ status: 'queued' })).toBe('queued');
+    expect(runState({ status: 'completed', conclusion: 'skipped' })).toBe('neutral');
+  });
+
+  test('formats durations', () => {
+    expect(formatDuration(null)).toBe('—');
+    expect(formatDuration(42)).toBe('42s');
+    expect(formatDuration(125)).toBe('2m 5s');
+    expect(formatDuration(7260)).toBe('2h 1m');
+  });
+});

@@ -32,6 +32,7 @@ jest.mock('recharts', () => ({
   ResponsiveContainer: ({ children }) => <div data-testid="responsive-container">{children}</div>,
   BarChart: ({ children }) => <div data-testid="bar-chart">{children}</div>,
   Bar: () => <div data-testid="bar" />,
+  Legend: () => <div data-testid="legend" />,
 }));
 
 // Mock environment variables

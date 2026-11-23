@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Icon from './Icons';
 
 const NotificationCenter = () => {
   const [message, setMessage] = useState('');
@@ -7,33 +8,32 @@ const NotificationCenter = () => {
   const [result, setResult] = useState(null);
 
   // Dynamic API base URL - supports both local development and production
-  const API_BASE = process.env.REACT_APP_API_URL || 
-                  (window.location.hostname === 'localhost' 
+  const API_BASE = process.env.REACT_APP_API_URL ||
+                  (window.location.hostname === 'localhost'
                     ? 'http://localhost:5000/api'
                     : null);
 
-  const sendSlackNotification = async () => {
+  const sendSlackNotification = async (e) => {
+    e.preventDefault();
     if (!message.trim()) return;
-    
+
     if (!API_BASE) {
-      setResult({ 
-        type: 'error', 
-        message: 'Slack notifications require a backend API. Please set REACT_APP_API_URL environment variable.' 
+      setResult({
+        type: 'error',
+        message: 'Slack notifications require a backend API. Please set REACT_APP_API_URL environment variable.'
       });
       return;
     }
-    
+
     setLoading(true);
     try {
-      await axios.post(`${API_BASE}/notify-slack`, {
-        message: message
-      });
+      await axios.post(`${API_BASE}/notify-slack`, { message });
       setResult({ type: 'success', message: 'Notification sent successfully!' });
       setMessage('');
     } catch (error) {
-      setResult({ 
-        type: 'error', 
-        message: error.response?.data?.error || 'Failed to send notification. Backend API may not be available.' 
+      setResult({
+        type: 'error',
+        message: error.response?.data?.error || 'Failed to send notification. Backend API may not be available.'
       });
     } finally {
       setLoading(false);
@@ -41,49 +41,42 @@ const NotificationCenter = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h3 className="text-lg font-semibold mb-4">🔔 Notification Center</h3>
-      
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Send Test Notification to Slack
-          </label>
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Enter your notification message..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows={3}
-          />
-        </div>
-        
+    <div className="card panel notify" style={{ '--i': 7 }}>
+      <h2 className="panel__title"><Icon name="bell" size={16} /> Notification Center</h2>
+
+      <form className="notify__form" onSubmit={sendSlackNotification}>
+        <label htmlFor="notify-message" className="field__label">
+          Send Test Notification to Slack
+        </label>
+        <textarea
+          id="notify-message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Enter your notification message..."
+          className="input input--area"
+          maxLength={500}
+          rows={4}
+        />
+        <span className="notify__count muted">{message.length}/500</span>
+
         <button
-          onClick={sendSlackNotification}
+          type="submit"
           disabled={loading || !message.trim()}
-          className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-busy={loading}
+          className="btn btn--primary btn--block"
         >
-          {loading ? '🔄 Sending...' : '📤 Send Notification'}
+          <Icon name={loading ? 'running' : 'send'} size={16} className={loading ? 'spin' : ''} />
+          {loading ? 'Sending…' : 'Send Notification'}
         </button>
-        
+      </form>
+
+      <div aria-live="polite">
         {result && (
-          <div className={`p-3 rounded-md ${
-            result.type === 'success' 
-              ? 'bg-green-50 text-green-800 border border-green-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}>
+          <div className={`toast toast--${result.type}`}>
+            <Icon name={result.type === 'success' ? 'success' : 'alert'} size={16} />
             {result.message}
           </div>
         )}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-12 pt-8 border-t border-gray-200">
-        <div className="text-center">
-          <p className="text-gray-600 text-sm">
-            Created with ❤️ by <span className="font-semibold text-gray-800">Nirmal Koswatta</span>
-          </p>
-        </div>
       </div>
     </div>
   );

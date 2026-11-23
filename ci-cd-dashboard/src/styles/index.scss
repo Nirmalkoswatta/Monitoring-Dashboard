@@ -1,0 +1,538 @@
+@use 'sass:map';
+@use 'sass:color';
+@use 'tokens' as *;
+
+// ---------- Base ----------
+*, *::before, *::after { box-sizing: border-box; }
+
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  font-family: $font;
+  font-size: 16px;
+  line-height: 1.5;
+  color: $text;
+  background: $bg;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, p, ul { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { @include focus-ring; }
+
+.icon { flex-shrink: 0; display: inline-block; vertical-align: -0.15em; }
+.spin { animation: spin 0.9s linear infinite; }
+.muted { color: $text-muted; font-size: 0.8125rem; }
+.mono { font-family: $mono; font-size: 0.8125rem; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+// ---------- Shell ----------
+.app {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  &__glow {
+    position: fixed;
+    inset: -30vh -10vw auto;
+    height: 70vh;
+    pointer-events: none;
+    background:
+      radial-gradient(40% 50% at 20% 30%, rgba($primary-strong, 0.18), transparent 70%),
+      radial-gradient(35% 45% at 80% 10%, rgba(map.get($status, queued), 0.14), transparent 70%);
+    filter: blur(20px);
+    animation: drift 18s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: $space * 6 $space * 4 $space * 10;
+
+  @include up($bp-md) { padding-inline: $space * 8; }
+}
+
+// ---------- Top bar ----------
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(14px) saturate(140%);
+  background: rgba($bg, 0.72);
+  border-bottom: 1px solid $border;
+  animation: slide-down 0.6s $ease-out both;
+
+  &__inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: $space * 4;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: $space * 4;
+
+    @include up($bp-md) { padding-inline: $space * 8; }
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: $space * 3;
+
+  &__mark {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    color: #fff;
+    background: linear-gradient(135deg, $primary-strong, map.get($status, queued));
+    box-shadow: 0 8px 24px -8px rgba($primary-strong, 0.7);
+    transform: perspective(300px) rotateY(-12deg);
+    transition: transform 0.5s $ease-spring;
+
+    &:hover { transform: perspective(300px) rotateY(12deg) scale(1.05); }
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+
+    @include up($bp-md) { font-size: 1.5rem; }
+  }
+
+  &__meta { display: flex; flex-wrap: wrap; gap: $space * 2; margin-top: $space; }
+}
+
+// ---------- Chips & badges ----------
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $space;
+  padding: 2px $space * 2;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: $text-muted;
+  background: $surface-2;
+  border: 1px solid $border;
+
+  &--repo { color: $primary; }
+  &--ok { color: map.get($status, success); border-color: rgba(map.get($status, success), 0.3); }
+  &--warn { color: map.get($status, cancelled); border-color: rgba(map.get($status, cancelled), 0.3); }
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s $ease-out infinite;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space;
+  padding: 2px $space * 2 + 2;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  @each $name, $c in $status {
+    &--#{$name} {
+      color: $c;
+      background: rgba($c, 0.12);
+      border: 1px solid rgba($c, 0.3);
+    }
+  }
+}
+
+// ---------- Forms ----------
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $space * 3;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: $space;
+
+  &__label { font-size: 0.75rem; font-weight: 600; color: $text-muted; letter-spacing: 0.02em; }
+  &__row { display: flex; gap: $space * 2; }
+}
+
+.input {
+  min-height: 44px;
+  padding: $space * 2 $space * 3;
+  border-radius: $radius-sm;
+  border: 1px solid $border-strong;
+  background: $surface;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s $ease-out;
+
+  &:focus { outline: none; border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.25); }
+  &--invalid { border-color: map.get($status, failure); }
+  &--area { width: 100%; resize: vertical; min-height: 96px; }
+
+  &[type='text'] { width: min(280px, 70vw); }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space * 2;
+  min-height: 44px;
+  padding: 0 $space * 4;
+  border-radius: $radius-sm;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: transform 0.18s $ease-out, box-shadow 0.2s, background 0.2s, opacity 0.2s;
+
+  &:active:not(:disabled) { transform: translateY(1px) scale(0.98); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &--primary {
+    color: #fff;
+    background: linear-gradient(180deg, $primary, $primary-strong);
+    box-shadow: 0 6px 18px -8px rgba($primary-strong, 0.9), inset 0 1px 0 rgba(#fff, 0.15);
+
+    &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 24px -10px rgba($primary-strong, 0.9); }
+  }
+
+  &--ghost {
+    background: $surface-2;
+    border-color: $border-strong;
+    &:hover:not(:disabled) { border-color: $primary; color: $primary; }
+  }
+
+  &--block { width: 100%; }
+}
+
+// ---------- Cards (3D) ----------
+.card {
+  position: relative;
+  background: linear-gradient(180deg, rgba($surface-2, 0.9), rgba($surface, 0.9));
+  border: 1px solid $border;
+  border-radius: $radius;
+  box-shadow: 0 1px 0 rgba(#fff, 0.04) inset, 0 20px 40px -24px rgba(#000, 0.8);
+  animation: flip-in 0.7s $ease-out backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+  transform-origin: 50% 0;
+}
+
+.card--tilt {
+  transform-style: preserve-3d;
+  transition: transform 0.45s $ease-spring, box-shadow 0.45s $ease-out, border-color 0.3s;
+
+  &:hover {
+    transform: perspective(800px) rotateX(6deg) rotateY(-6deg) translateY(-4px);
+    border-color: $border-strong;
+    box-shadow: 0 30px 50px -24px rgba(#000, 0.9), 0 0 0 1px rgba($primary, 0.08);
+  }
+  > * { transform: translateZ(20px); }
+}
+
+.updated { margin-bottom: $space * 4; font-size: 0.8125rem; color: $text-muted; }
+
+// ---------- Stats ----------
+.stats {
+  display: grid;
+  gap: $space * 4;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-bottom: $space * 6;
+}
+
+.stat {
+  padding: $space * 5;
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin-bottom: $space * 3;
+    border-radius: 10px;
+  }
+  &__label { font-size: 0.8125rem; color: $text-muted; }
+  &__value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @each $name, $c in $tones {
+    &--#{$name} &__icon { color: $c; background: rgba($c, 0.12); box-shadow: 0 0 24px -6px rgba($c, 0.6); }
+  }
+}
+
+// ---------- Panels ----------
+.panels {
+  display: grid;
+  gap: $space * 4;
+  grid-template-columns: 1fr;
+  margin-bottom: $space * 6;
+
+  @include up($bp-md) { grid-template-columns: 1fr 1fr; }
+  @include up($bp-lg) { grid-template-columns: 1.2fr 1.2fr 1fr; }
+}
+
+.panel {
+  padding: $space * 5;
+  min-width: 0;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: $space * 2;
+    margin-bottom: $space * 4;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+.notify {
+  &__form { display: flex; flex-direction: column; gap: $space * 2; }
+  &__count { align-self: flex-end; margin-top: -$space; }
+}
+
+.toast {
+  display: flex;
+  gap: $space * 2;
+  align-items: flex-start;
+  margin-top: $space * 3;
+  padding: $space * 3;
+  border-radius: $radius-sm;
+  font-size: 0.875rem;
+  animation: pop-in 0.4s $ease-spring both;
+
+  &--success { color: map.get($status, success); background: rgba(map.get($status, success), 0.1); }
+  &--error { color: map.get($status, failure); background: rgba(map.get($status, failure), 0.1); }
+}
+
+// ---------- Alert ----------
+.alert {
+  display: flex;
+  gap: $space * 3;
+  margin-bottom: $space * 6;
+  padding: $space * 4;
+  border-radius: $radius;
+  color: color.adjust(map.get($status, failure), $lightness: 10%);
+  background: rgba(map.get($status, failure), 0.08);
+  border: 1px solid rgba(map.get($status, failure), 0.35);
+  animation: shake 0.5s $ease-out both;
+
+  &__title { font-weight: 700; }
+  &__list { margin-top: $space * 2; padding-left: $space * 5; font-size: 0.875rem; color: $text-muted; }
+}
+
+// ---------- Runs ----------
+.runs {
+  padding: $space * 5;
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space * 3;
+    margin-bottom: $space * 2;
+
+    .panel__title { margin: 0; }
+  }
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 11px;
+  background: $surface;
+  border: 1px solid $border;
+
+  &__btn {
+    min-height: 36px;
+    padding: 0 $space * 3;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: $text-muted;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover { color: $text; }
+    &.is-active { background: $surface-2; color: $text; box-shadow: 0 1px 0 rgba(#fff, 0.06) inset, 0 4px 12px -6px #000; }
+  }
+}
+
+.run-list { list-style: none; padding: 0; perspective: 1200px; }
+
+.run {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: $space * 3;
+  margin-top: $space * 2;
+  padding: $space * 4 $space * 4 $space * 4 $space * 5;
+  border-radius: $radius-sm + 2;
+  background: rgba($surface, 0.7);
+  border: 1px solid $border;
+  overflow: hidden;
+  animation: rise-in 0.5s $ease-out backwards;
+  animation-delay: calc(min(var(--i, 0), 12) * 40ms);
+  transition: transform 0.35s $ease-out, border-color 0.25s, background 0.25s;
+
+  &:hover {
+    transform: translateZ(18px) rotateX(2deg);
+    background: $surface-2;
+    border-color: $border-strong;
+  }
+
+  &__rail { position: absolute; inset: 0 auto 0 0; width: 3px; }
+
+  @each $name, $c in $status {
+    &--#{$name} &__rail { background: $c; box-shadow: 0 0 12px rgba($c, 0.7); }
+  }
+  &--running &__rail { animation: rail-glow 1.6s ease-in-out infinite; }
+
+  &__main { min-width: 0; flex: 1 1 320px; }
+  &__title { display: flex; flex-wrap: wrap; align-items: center; gap: $space * 2; }
+  &__name { font-weight: 600; overflow-wrap: anywhere; }
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space * 3;
+    margin-top: $space;
+    font-size: 0.8125rem;
+    color: $text-muted;
+
+    > span { display: inline-flex; align-items: center; gap: $space; }
+  }
+
+  &__side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    text-align: right;
+    font-size: 0.8125rem;
+  }
+  &__time { font-weight: 600; }
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: $space;
+  min-height: 24px;
+  color: $primary;
+  font-weight: 600;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+// ---------- States ----------
+.skeleton-list { padding-top: $space * 2; text-align: center; }
+.skeleton {
+  height: 72px;
+  margin-top: $space * 2;
+  border-radius: $radius-sm + 2;
+  background: linear-gradient(90deg, $surface 0%, $surface-2 40%, $surface 80%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.skeleton-list .muted { margin-top: $space * 3; }
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space * 2;
+  padding: $space * 10 0;
+  color: $text-muted;
+}
+
+.footer {
+  margin-top: $space * 10;
+  padding-top: $space * 6;
+  border-top: 1px solid $border;
+  text-align: center;
+  font-size: 0.875rem;
+  color: $text-muted;
+
+  &__name { font-weight: 600; color: $text; }
+}
+
+// ---------- Keyframes ----------
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes flip-in {
+  from { opacity: 0; transform: perspective(900px) rotateX(-18deg) translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px) rotateX(-8deg); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-100%); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: none; }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 currentColor; }
+  70%, 100% { box-shadow: 0 0 0 6px transparent; }
+}
+
+@keyframes rail-glow { 50% { opacity: 0.35; } }
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@keyframes drift {
+  to { transform: translate3d(4vw, 6vh, 0) scale(1.08); }
+}
+
+// ---------- Reduced motion ----------
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .card--tilt:hover, .run:hover, .brand__mark, .brand__mark:hover { transform: none; }
+}
